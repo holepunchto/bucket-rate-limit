@@ -33,7 +33,7 @@ module.exports = class BucketRateLimiter {
    * @param {number} options.capacity - Max tokens (burst capacity)
    * @param {number} options.intervalMs - Time interval in milliseconds to refill 1 token
    */
-  constructor ({ capacity, intervalMs } = {}) {
+  constructor (capacity, intervalMs) {
     this.capacity = capacity
     this.intervalMs = intervalMs
 

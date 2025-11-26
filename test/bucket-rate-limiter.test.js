@@ -72,7 +72,7 @@ test('refill does not exceed capacity across many intervals', async function (t)
   rateLimiter.destroy()
 })
 
-test('queued execution aborts when abortSignalPromise rejects while waiting', async function (t) {
+test('queued execution aborts when abort rejects while waiting', async function (t) {
   const rateLimiter = new BucketRateLimiter(1, 200)
 
   // Occupy the only token
@@ -82,7 +82,7 @@ test('queued execution aborts when abortSignalPromise rejects while waiting', as
 
   // This execution should queue and abort before any refill
   const queued = rateLimiter
-    .wait({ abortSignalPromise: abortSignal.wait() })
+    .wait({ abort: abortSignal.wait() })
     .then(() => {
       t.fail('queued fn should not run')
     })
@@ -101,7 +101,7 @@ test('running execution abort signal during execution does not advance token ava
 
   // Start a long-running task and "abort" during execution
   const longRunning = rateLimiter
-    .wait({ abortSignalPromise: abortSignal.wait() })
+    .wait({ abort: abortSignal.wait() })
     .then(async () => {
       await new Promise((resolve) => setTimeout(resolve, 300))
       return 'long'

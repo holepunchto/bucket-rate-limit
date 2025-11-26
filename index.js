@@ -62,16 +62,16 @@ module.exports = class BucketRateLimiter {
    * Wait until a token is available. Returns immediately if the capacity is available.
    *
    * @param {object} [options] - Options for the execution.
-   * @param {Promise<void>} [options.abortSignalPromise] - Promise that rejects when the execution should be aborted.
+   * @param {Promise<void>} [options.abort] - Promise that rejects when the execution should be aborted.
    * @returns {Promise<void>}
    */
-  async wait ({ abortSignalPromise = NEVER_PROMISE } = {}) {
+  async wait ({ abort = NEVER_PROMISE } = {}) {
     while (!this._tryAcquire()) {
       if (this.destroyed) {
         throw BucketRateLimiterError.BUCKET_RATE_LIMITER_DESTROYED()
       }
 
-      await Promise.race([this._refillSignal.wait(), abortSignalPromise])
+      await Promise.race([this._refillSignal.wait(), abort])
     }
 
     if (this.destroyed) {

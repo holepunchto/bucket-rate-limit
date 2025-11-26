@@ -6,6 +6,10 @@
   "bugs": {
     "url": "https://github.com/holepunchto/bucket-rate-limit/issues"
   },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/holepunchto/bucket-rate-limit.git"

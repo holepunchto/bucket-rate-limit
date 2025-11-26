@@ -1,6 +1,6 @@
 {
   "name": "bucket-rate-limit",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A lightweight, bucket-based rate limiter for JavaScript that controls request frequency with minimal overhead.",
   "homepage": "https://github.com/holepunchto/bucket-rate-limit#readme",
   "bugs": {

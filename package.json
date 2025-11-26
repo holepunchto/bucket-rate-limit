@@ -18,14 +18,18 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "test": "standard && brittle test/*"
+    "format": "prettier --write .",
+    "lint": "prettier --check .",
+    "test": "npm run lint && brittle test/*"
   },
   "devDependencies": {
     "brittle": "^3.19.1",
-    "standard": "^17.1.2"
+    "prettier": "^3.6.2",
+    "prettier-config-holepunch": "^2.0.0",
+    "prettier-config-standard": "^7.0.0"
   },
   "dependencies": {
     "signal-promise": "^1.0.3"
   },
-  "types": "index.d.ts"
+  "prettier": "prettier-config-standard"
 }

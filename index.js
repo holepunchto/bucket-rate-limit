@@ -3,7 +3,7 @@ const Signal = require('signal-promise')
 const NEVER_PROMISE = new Promise(() => {})
 
 class BucketRateLimiterError extends Error {
-  constructor (msg, code, fn = BucketRateLimiterError) {
+  constructor(msg, code, fn = BucketRateLimiterError) {
     super(`${code}: ${msg}`)
     this.code = code
 
@@ -12,11 +12,11 @@ class BucketRateLimiterError extends Error {
     }
   }
 
-  get name () {
+  get name() {
     return 'BucketRateLimiterError'
   }
 
-  static BUCKET_RATE_LIMITER_DESTROYED () {
+  static BUCKET_RATE_LIMITER_DESTROYED() {
     return new BucketRateLimiterError(
       'The bucket rate limiter is destroyed',
       'BUCKET_RATE_LIMITER_DESTROYED',
@@ -32,7 +32,7 @@ module.exports = class BucketRateLimiter {
    * @param {number} capacity - Max tokens (burst capacity)
    * @param {number} intervalMs - Time interval in milliseconds to refill 1 token
    */
-  constructor (capacity, intervalMs) {
+  constructor(capacity, intervalMs) {
     this.capacity = capacity
     this.intervalMs = intervalMs
 
@@ -42,13 +42,13 @@ module.exports = class BucketRateLimiter {
     this._refillSignal = new Signal()
   }
 
-  _refill () {
+  _refill() {
     if (this.tokens >= this.capacity) return // no need to refill
     this.tokens++
     if (this.tokens === 1) this._refillSignal.notify()
   }
 
-  _tryAcquire () {
+  _tryAcquire() {
     if (this.tokens > 0) {
       this.tokens--
       return true
@@ -64,7 +64,7 @@ module.exports = class BucketRateLimiter {
    * @param {Promise<void>} [options.abort] - Promise that rejects when the execution should be aborted.
    * @returns {Promise<void>}
    */
-  async wait ({ abort = NEVER_PROMISE } = {}) {
+  async wait({ abort = NEVER_PROMISE } = {}) {
     while (!this._tryAcquire()) {
       if (this.destroyed) {
         throw BucketRateLimiterError.BUCKET_RATE_LIMITER_DESTROYED()
@@ -78,7 +78,7 @@ module.exports = class BucketRateLimiter {
     }
   }
 
-  destroy () {
+  destroy() {
     if (this.destroyed) {
       throw BucketRateLimiterError.BUCKET_RATE_LIMITER_DESTROYED()
     }

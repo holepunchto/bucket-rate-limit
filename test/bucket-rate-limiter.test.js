@@ -81,11 +81,9 @@ test('queued execution aborts when abort rejects while waiting', async function 
   const abortSignal = new Signal()
 
   // This execution should queue and abort before any refill
-  const queued = rateLimiter
-    .wait({ abort: abortSignal.wait() })
-    .then(() => {
-      t.fail('queued fn should not run')
-    })
+  const queued = rateLimiter.wait({ abort: abortSignal.wait() }).then(() => {
+    t.fail('queued fn should not run')
+  })
 
   setTimeout(() => abortSignal.notify(new Error('ABORTED_TEST_WAITING')), 50)
 
@@ -132,6 +130,6 @@ test('running execution abort signal during execution does not advance token ava
   rateLimiter.destroy()
 })
 
-function eventFlush () {
+function eventFlush() {
   return new Promise((resolve) => setImmediate(resolve))
 }

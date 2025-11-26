@@ -1,4 +1,4 @@
-# bucket-rate-limit
+# Bucket Rate Limit
 
 A lightweight, bucket-based rate limiter for Node.js that controls request frequency with minimal overhead.
 
@@ -12,12 +12,25 @@ npm i bucket-rate-limit
 
 ## API
 
-- `new BucketRateLimiter({ capacity, intervalMs })`
-  - **capacity**: maximum number of tokens (burst size)
-  - **intervalMs**: milliseconds per token refill (refills 1 token each interval)
-- `await limiter.wait({ abortSignalPromise })` - Wait until a token is available. Returns immediately if the capacity is available.
-  - **abortSignalPromise** (optional): a promise that rejects to abort waiting
-- `limiter.destroy()`: stop refilling and abort any pending waits
+#### `const limiter = new BucketRateLimiter(capacity, intervalMs)`
+
+Create a new rate limiter, with parameters:
+  - `capacity`: maximum number of tokens (burst size)
+  - `intervalMs`: milliseconds per token refill (refills 1 token each interval)
+
+For example:
+- `capacity = 1` and `intervalMs = 200` allows 5 requests per second, and no bursts.
+- `capacity = 10` and `intervalMs = 200` allows bursts up to 10 requests, but still limits long-term throughput to 5 requests per second.
+- `capacity = 10` and `intervalMs = 1000` also allows bursts up to 10 requests, but long-term throughput of just 1 request per second.
+
+#### `await limiter.wait({ abort } = {})`
+Wait until a token is available. Returns immediately if the capacity is available.
+
+Optional **abort**: a promise that can cause the wait to abort by rejecting. Default is to not support aborting (so it will keep waiting until a token is available).
+
+#### `limiter.destroy()`
+
+Destroy the rate limiter: stops refilling the bucket and aborts any pending waits.
 
 ## License
 

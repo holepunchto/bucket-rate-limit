@@ -3,10 +3,7 @@ const BucketRateLimiter = require('../')
 const Signal = require('signal-promise')
 
 test('consumes capacity immediately then waits for refill', async function (t) {
-  const rateLimiter = new BucketRateLimiter({
-    capacity: 2,
-    intervalMs: 100
-  })
+  const rateLimiter = new BucketRateLimiter(2, 100)
 
   let a = null
   let b = null
@@ -37,10 +34,7 @@ test('consumes capacity immediately then waits for refill', async function (t) {
 })
 
 test('refill does not exceed capacity across many intervals', async function (t) {
-  const rateLimiter = new BucketRateLimiter({
-    capacity: 2,
-    intervalMs: 250
-  })
+  const rateLimiter = new BucketRateLimiter(2, 250)
 
   // Drain initial capacity
   await rateLimiter.wait()
@@ -78,11 +72,8 @@ test('refill does not exceed capacity across many intervals', async function (t)
   rateLimiter.destroy()
 })
 
-test('queued execution aborts when abortSignalPromise rejects while waiting', async function (t) {
-  const rateLimiter = new BucketRateLimiter({
-    capacity: 1,
-    intervalMs: 200
-  })
+test('queued execution aborts when abort rejects while waiting', async function (t) {
+  const rateLimiter = new BucketRateLimiter(1, 200)
 
   // Occupy the only token
   rateLimiter.wait()
@@ -91,7 +82,7 @@ test('queued execution aborts when abortSignalPromise rejects while waiting', as
 
   // This execution should queue and abort before any refill
   const queued = rateLimiter
-    .wait({ abortSignalPromise: abortSignal.wait() })
+    .wait({ abort: abortSignal.wait() })
     .then(() => {
       t.fail('queued fn should not run')
     })
@@ -104,16 +95,13 @@ test('queued execution aborts when abortSignalPromise rejects while waiting', as
 })
 
 test('running execution abort signal during execution does not advance token availability', async function (t) {
-  const rateLimiter = new BucketRateLimiter({
-    capacity: 1,
-    intervalMs: 1000
-  })
+  const rateLimiter = new BucketRateLimiter(1, 1000)
 
   const abortSignal = new Signal()
 
   // Start a long-running task and "abort" during execution
   const longRunning = rateLimiter
-    .wait({ abortSignalPromise: abortSignal.wait() })
+    .wait({ abort: abortSignal.wait() })
     .then(async () => {
       await new Promise((resolve) => setTimeout(resolve, 300))
       return 'long'

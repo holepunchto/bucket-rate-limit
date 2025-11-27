@@ -98,12 +98,10 @@ test('running execution abort signal during execution does not advance token ava
   const abortSignal = new Signal()
 
   // Start a long-running task and "abort" during execution
-  const longRunning = rateLimiter
-    .wait({ abort: abortSignal.wait() })
-    .then(async () => {
-      await new Promise((resolve) => setTimeout(resolve, 300))
-      return 'long'
-    })
+  const longRunning = rateLimiter.wait({ abort: abortSignal.wait() }).then(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    return 'long'
+  })
 
   let queuedFinished = false
   rateLimiter.wait().then(async () => {
@@ -117,11 +115,7 @@ test('running execution abort signal during execution does not advance token ava
   await new Promise((resolve) => setTimeout(resolve, 400))
   t.is(queuedFinished, false, 'no refill yet, queued should still be waiting')
 
-  t.is(
-    await longRunning,
-    'long',
-    'long running task should complete unaffected by abort'
-  )
+  t.is(await longRunning, 'long', 'long running task should complete unaffected by abort')
 
   // After the first refill interval elapses, queued should proceed
   await new Promise((resolve) => setTimeout(resolve, 700))

@@ -4,72 +4,43 @@ const Signal = require('signal-promise')
 
 test('consumes capacity immediately then waits for refill', async function (t) {
   const rateLimiter = new BucketRateLimiter(2, 100)
-
-  let a = null
-  let b = null
-  let c = null
-
-  rateLimiter.wait().then(() => {
-    a = 'a'
-  })
-  rateLimiter.wait().then(() => {
-    b = 'b'
-  })
-  rateLimiter.wait().then(() => {
-    c = 'c'
+  t.teardown(() => {
+    rateLimiter.destroy()
   })
 
-  await eventFlush()
+  t.is(rateLimiter.tryAcquire(), true)
+  t.is(rateLimiter.tryAcquire(), true)
+  t.is(rateLimiter.tryAcquire(), false)
 
-  t.is(a, 'a')
-  t.is(b, 'b')
-  t.is(c, null)
+  // Refill happens at 100ms
+  await new Promise((resolve) => setTimeout(resolve, 110))
 
-  // Refill happens at 100ms, expect p3 to complete after that
-  await new Promise((resolve) => setTimeout(resolve, 100))
+  t.is(rateLimiter.tryAcquire(), true)
+  t.is(rateLimiter.tryAcquire(), false)
 
-  t.is(c, 'c')
+  // Refill happens at 100ms
+  await new Promise((resolve) => setTimeout(resolve, 210))
 
-  rateLimiter.destroy()
+  t.is(rateLimiter.tryAcquire(), true)
+  t.is(rateLimiter.tryAcquire(), true)
 })
 
 test('refill does not exceed capacity across many intervals', async function (t) {
-  const rateLimiter = new BucketRateLimiter(2, 250)
+  const rateLimiter = new BucketRateLimiter(2, 100)
+  t.teardown(() => {
+    rateLimiter.destroy()
+  })
 
   // Drain initial capacity
-  await rateLimiter.wait()
-  await rateLimiter.wait()
+  t.is(rateLimiter.tryAcquire(), true)
+  t.is(rateLimiter.tryAcquire(), true)
 
   // Advance many intervals; tokens should cap at capacity (2)
-  await new Promise((resolve) => setTimeout(resolve, 1200))
+  await new Promise((resolve) => setTimeout(resolve, 300))
 
-  t.is(rateLimiter.tokens, 2)
-
-  // Two immediate executions should proceed without waiting
-  let y1 = null
-  let y2 = null
-  let y3 = null
-  rateLimiter.wait().then(() => {
-    y1 = 'y1'
-  })
-  rateLimiter.wait().then(() => {
-    y2 = 'y2'
-  })
-  rateLimiter.wait().then(() => {
-    y3 = 'y3'
-  })
-
-  await eventFlush()
-
-  t.is(y1, 'y1')
-  t.is(y2, 'y2')
-  t.is(y3, null)
-
-  await new Promise((resolve) => setTimeout(resolve, 500))
-
-  t.is(y3, 'y3')
-
-  rateLimiter.destroy()
+  t.is(rateLimiter.tryAcquire(), true)
+  t.is(rateLimiter.tryAcquire(), true)
+  t.is(rateLimiter.tryAcquire(), false)
 })
 
 test('queued execution aborts when abort rejects while waiting', async function (t) {

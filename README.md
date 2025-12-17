@@ -25,6 +25,10 @@ For example:
 - `capacity = 10` and `intervalMs = 200` allows bursts up to 10 requests, but still limits long-term throughput to 5 requests per second.
 - `capacity = 10` and `intervalMs = 1000` also allows bursts up to 10 requests, but long-term throughput of just 1 request per second.
 
+#### `limiter.tryAcquire()`
+
+Attempts to acquire a token. Returns true if successful, false otherwise.
+
 #### `await limiter.wait({ abort } = {})`
 
 Wait until a token is available. Returns immediately if the capacity is available.

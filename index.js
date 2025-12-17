@@ -48,7 +48,7 @@ module.exports = class BucketRateLimiter {
     if (this.tokens === 1) this._refillSignal.notify()
   }
 
-  _tryAcquire() {
+  tryAcquire() {
     if (this.tokens > 0) {
       this.tokens--
       return true
@@ -65,7 +65,7 @@ module.exports = class BucketRateLimiter {
    * @returns {Promise<void>}
    */
   async wait({ abort = NEVER_PROMISE } = {}) {
-    while (!this._tryAcquire()) {
+    while (!this.tryAcquire()) {
       if (this.destroyed) {
         throw BucketRateLimiterError.BUCKET_RATE_LIMITER_DESTROYED()
       }

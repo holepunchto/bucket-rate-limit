@@ -31,6 +31,10 @@ Wait until a token is available. Returns immediately if the capacity is availabl
 
 Optional **abort**: a promise that can cause the wait to abort by rejecting. Default is to not support aborting (so it will keep waiting until a token is available).
 
+#### `limiter.getOrThrow()`
+
+Returns if a token is available (after consuming it). Otherwise throws.
+
 #### `limiter.destroy()`
 
 Destroy the rate limiter: stops refilling the bucket and aborts any pending waits.

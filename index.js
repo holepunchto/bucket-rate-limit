@@ -23,6 +23,14 @@ class BucketRateLimiterError extends Error {
       BucketRateLimiterError.BUCKET_RATE_LIMITER_DESTROYED
     )
   }
+
+  static BUCKET_RATE_LIMITER_LIMITED() {
+    return new BucketRateLimiterError(
+      'The limit of the bucket rate limit is reached',
+      'BUCKET_RATE_LIMITER_LIMITED',
+      BucketRateLimiterError.BUCKET_RATE_LIMITER_LIMITED
+    )
+  }
 }
 
 module.exports = class BucketRateLimiter {
@@ -76,6 +84,11 @@ module.exports = class BucketRateLimiter {
     if (this.destroyed) {
       throw BucketRateLimiterError.BUCKET_RATE_LIMITER_DESTROYED()
     }
+  }
+
+  getOrThrow() {
+    if (this._tryAcquire()) return
+    throw BucketRateLimiterError.BUCKET_RATE_LIMITER_LIMITED()
   }
 
   destroy() {

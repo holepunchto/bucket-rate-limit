@@ -124,6 +124,21 @@ test('running execution abort signal during execution does not advance token ava
   rateLimiter.destroy()
 })
 
+test.solo('getOrThrow', async function (t) {
+  const rateLimiter = new BucketRateLimiter(2, 100)
+
+  rateLimiter.getOrThrow()
+  rateLimiter.getOrThrow()
+  t.exception(() => rateLimiter.getOrThrow(), /BUCKET_RATE_LIMITER_LIMITED/)
+
+  await new Promise((resolve) => setTimeout(resolve, 110))
+
+  rateLimiter.getOrThrow()
+  t.pass('can get again after bucket tick')
+
+  rateLimiter.destroy()
+})
+
 function eventFlush() {
   return new Promise((resolve) => setImmediate(resolve))
 }

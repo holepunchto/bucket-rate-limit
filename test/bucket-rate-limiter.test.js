@@ -124,7 +124,7 @@ test('running execution abort signal during execution does not advance token ava
   rateLimiter.destroy()
 })
 
-test.solo('getOrThrow', async function (t) {
+test('getOrThrow', async function (t) {
   const rateLimiter = new BucketRateLimiter(2, 100)
 
   rateLimiter.getOrThrow()
